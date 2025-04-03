@@ -1,0 +1,8 @@
+[
+{
+  "directory": "C:/Users/ZhangDongzai/Documents/Code/Snake/build",
+  "command": "C:\\Users\\ZhangDongzai\\Documents\\Tools\\mingw64\\bin\\gcc.exe  @CMakeFiles/snake.dir/includes_C.rsp -g -o CMakeFiles\\snake.dir\\src\\main.c.obj -c C:\\Users\\ZhangDongzai\\Documents\\Code\\Snake\\src\\main.c",
+  "file": "C:/Users/ZhangDongzai/Documents/Code/Snake/src/main.c",
+  "output": "CMakeFiles/snake.dir/src/main.c.obj"
+}
+]
