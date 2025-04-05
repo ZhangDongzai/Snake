@@ -1,3 +1,0 @@
-C:/Users/ZhangDongzai/Documents/Code/Snake/build/CMakeFiles/snake.dir
-C:/Users/ZhangDongzai/Documents/Code/Snake/build/CMakeFiles/edit_cache.dir
-C:/Users/ZhangDongzai/Documents/Code/Snake/build/CMakeFiles/rebuild_cache.dir

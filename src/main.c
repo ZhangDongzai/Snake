@@ -2,10 +2,12 @@
 #define MAP_HEIGHT 10
 #define WINDOW_TITLE "Snake"
 #define WINDOW_WIDTH 500
-#define WINDOW_HEIGHT 500
+#define WINDOW_HEIGHT 570
 #define WINDOW_FPS 60
 #define WINDOW_REFRESH_TIME_MS (1000 / WINDOW_FPS)
 #define MAP_SIZE (WINDOW_WIDTH / MAP_WIDTH)
+#define COLOR_WHITE (SDL_Color) {255, 255, 255, SDL_ALPHA_OPAQUE}
+#define COLOR_RED (SDL_Color) {255, 0, 0, SDL_ALPHA_OPAQUE}
 #define SNAKE_MOVE_TIME_MS 500
 #define SDL_MAIN_USE_CALLBACKS 1
 
@@ -14,6 +16,7 @@
 #include <stdbool.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 
 typedef enum {
@@ -33,11 +36,14 @@ typedef struct {
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
+static TTF_Font *font = NULL;
 static const bool *keyboardState = NULL;
 static Uint64 framePrevTime = 0;
 static Uint64 snakePrevTime = 0;
 static Snake *snake = NULL;
+static int score = 0;
 static int food[2];
+static bool win = false;
 
 
 void initSnake(Snake **snake) {
@@ -50,6 +56,7 @@ void initSnake(Snake **snake) {
 
 
 void updateSnake(Snake *snake, Uint64 currentTime) {
+    if (win) return;
     int dx, dy; dx = dy = 0;
 
     // Set movement direction
@@ -72,6 +79,8 @@ void updateSnake(Snake *snake, Uint64 currentTime) {
         snake->body[0][1] + dy == food[1]) {
         snake->isEat = true;
         food[0] = SDL_rand(10); food[1] = SDL_rand(10);
+        score++;
+        if (score >= 99) win = true;
     }
     if (snake->isEat) {
         snake->body[snake->length][0] = snake->body[snake->length - 1][0];
@@ -105,13 +114,41 @@ void updateSnake(Snake *snake, Uint64 currentTime) {
 }
 
 
-void renderSnake(Snake *snake, SDL_Renderer *renderer) {
+void renderSnake(Snake *snake) {
     SDL_FRect rect; rect.h = rect.w = MAP_SIZE;
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     for (int i = 0; i < snake->length; i++) {
         rect.x = snake->body[i][0] * MAP_SIZE;
         rect.y = snake->body[i][1] * MAP_SIZE;
         SDL_RenderFillRect(renderer, &rect);
+    }
+}
+
+
+void renderFood() {
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+    SDL_FRect foodRect = {food[0] * MAP_SIZE, food[1] * MAP_SIZE, 
+                          MAP_SIZE, MAP_SIZE};
+    SDL_RenderFillRect(renderer, &foodRect);
+}
+
+
+void renderScore() {
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    SDL_RenderLine(renderer, 0, 510, 500, 510);
+
+    char text[9] = "";
+    sprintf(text, "SCORE: %02d", score);
+    SDL_Surface* textSurface = TTF_RenderText_Blended(font, text, 0, COLOR_WHITE);
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FRect dstRect = {10, 520, textSurface->w, textSurface->h};
+    SDL_RenderTexture(renderer, textTexture, NULL, &dstRect);
+
+    if (win) {
+        SDL_Surface* textSurfaceWin = TTF_RenderText_Blended(font, "WIN", 0, COLOR_RED);
+        SDL_Texture* textTextureWin = SDL_CreateTextureFromSurface(renderer, textSurfaceWin);
+        SDL_FRect dstRectWin = {400, 520, textSurfaceWin->w, textSurfaceWin->h};
+        SDL_RenderTexture(renderer, textTextureWin, NULL, &dstRectWin);
     }
 }
 
@@ -124,8 +161,19 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
         return SDL_APP_FAILURE;
     }
 
+    if (!TTF_Init()) {
+        SDL_Log("Couldn't initialize SDL_ttf: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
     if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    font = TTF_OpenFont("C:/Windows/Fonts/arial.ttf", 40);
+    if (!font) {
+        SDL_Log("Couldn't open font: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
@@ -175,17 +223,12 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     updateSnake(snake, currentTime);
 
-    // Render background
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
 
-    // Render food
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-    SDL_FRect foodRect = {food[0] * MAP_SIZE, food[1] * MAP_SIZE, 
-                          MAP_SIZE, MAP_SIZE};
-    SDL_RenderFillRect(renderer, &foodRect);
-
-    renderSnake(snake, renderer);
+    renderFood();
+    renderSnake(snake);
+    renderScore();
 
     SDL_RenderPresent(renderer);
 
@@ -197,4 +240,7 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result) {
     free(snake);
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
+    TTF_CloseFont(font);
+    TTF_Quit();
+    SDL_Quit();
 }
