@@ -11,6 +11,8 @@ include_directories(include)
 target_sources(snake
 PRIVATE
     src/main.c
+    src/food.c
+    src/snake.c
 )
 
 target_link_libraries(snake SDL3::SDL3 SDL3_ttf::SDL3_ttf)
