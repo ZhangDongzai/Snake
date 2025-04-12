@@ -4,6 +4,7 @@
 #include <common.h>
 #include <food.h>
 #include <snake.h>
+#include <menu.h>
 
 typedef struct
 {

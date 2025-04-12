@@ -3,6 +3,7 @@
 
 #include <common.h>
 #include <food.h>
+#include <menu.h>
 
 #define SNAKE_MOVE_TIME_MS 500
 
@@ -24,8 +25,8 @@ typedef struct {
 
 extern Snake snake;
 
-void initSnake(Snake *snake);
-void updateSnake(Snake *snake, Uint64 currentTime);
-void renderSnake(Snake *snake);
+void initSnake();
+void updateSnake(Uint64 currentTime);
+void renderSnake();
 
 #endif // SNAKE_INCLUDE_SNAKE_H

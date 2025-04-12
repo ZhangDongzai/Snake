@@ -20,7 +20,6 @@
 #define MAP_HEIGHT 10
 #define MAP_SIZE (WINDOW_WIDTH / MAP_WIDTH)
 
-extern int score;
 extern bool win;
 
 #endif // SNAKE_INCLUDE_COMMON_H
