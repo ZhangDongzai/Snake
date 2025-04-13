@@ -34,7 +34,7 @@ void updateSnake(Uint64 currentTime) {
     if (snake.body[0][0] + dx == food[0] &&
         snake.body[0][1] + dy == food[1]) {
         snake.isEat = true;
-        food[0] = SDL_rand(10); food[1] = SDL_rand(10);
+        freshFood();
         score++;
         if (score >= 99) win = true;
     }
@@ -65,6 +65,13 @@ void updateSnake(Uint64 currentTime) {
     } else if (snake.body[0][1] == MAP_HEIGHT) {
         snake.body[0][1] = 0;
     }
+    if (snake.body[0][0] == food[0] &&
+        snake.body[0][1] == food[1] && snake.isEat == false) {
+        snake.isEat = true;
+        freshFood();
+        score++;
+        if (score >= 99) win = true;
+    }
 
     snake.prevTime = currentTime;
 }
@@ -72,10 +79,18 @@ void updateSnake(Uint64 currentTime) {
 
 void renderSnake() {
     SDL_FRect rect; rect.h = rect.w = MAP_SIZE;
+
+    // Body
     SDL_SetRenderDrawColor(app.renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-    for (int i = 0; i < snake.length; i++) {
+    for (int i = 1; i < snake.length; i++) {
         rect.x = snake.body[i][0] * MAP_SIZE;
         rect.y = snake.body[i][1] * MAP_SIZE;
         SDL_RenderFillRect(app.renderer, &rect);
     }
+
+    // Head
+    SDL_SetRenderDrawColor(app.renderer, 255, 255, 0, SDL_ALPHA_OPAQUE);
+    rect.x = snake.body[0][0] * MAP_SIZE;
+    rect.y = snake.body[0][1] * MAP_SIZE;
+    SDL_RenderFillRect(app.renderer, &rect);
 }

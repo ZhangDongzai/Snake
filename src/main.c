@@ -35,6 +35,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
     app.framePrevTime = SDL_GetTicks();
     app.keyboardState = SDL_GetKeyboardState(NULL);
+    SDL_srand(app.framePrevTime);
     
     freshFood();
     initSnake();
@@ -79,8 +80,8 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(app.renderer);
 
-    renderFood();
     renderSnake();
+    renderFood();
     renderMenu();
 
     SDL_RenderPresent(app.renderer);

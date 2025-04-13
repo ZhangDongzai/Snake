@@ -3,7 +3,6 @@
 int food[2];
 
 void freshFood() {
-    SDL_srand(app.framePrevTime);
     food[0] = SDL_rand(10); food[1] = SDL_rand(10);
 }
 
