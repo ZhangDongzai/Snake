@@ -19,7 +19,6 @@ typedef struct {
     int body[MAP_WIDTH * MAP_HEIGHT][2];
     int length;
     direction direction;
-    bool isEat;
     Uint64 prevTime;
 } Snake;
 
